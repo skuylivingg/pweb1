@@ -16,15 +16,14 @@
     margin-top: 20px;
     animation: slide 2s infinite;
 }
-    
-  @keyframes slide {    
+@keyframes slide {    
     0% {
    transform: translateX(0);
-  }
+}
  50% { 
   transform: translateX(100px);
   }
 100% {
     transform: translateX(0);
-     }
-)
+ }
+    }
