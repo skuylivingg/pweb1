@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Job Management</title>
+    <script>
+      async function fetchJobs() {
+        const response = await fetch(
+          "https://script.google.com/macros/s/AKfycbzHAxve4x3yakdkvxTfPbPenUgyIG6qfSI0Q_CoyX10e37UvPabLbx46mDAI0LWssEOPg/exec"
+        );
+        const data = await response.json();
+        displayJobs(data);
+      }
+
+      async function addJob() {
+        const title = document.getElementById("jobTitle").value;
+        const description = document.getElementById("jobDescription").value;
+
+        const response = await fetch(
+          "https://script.google.com/macros/s/AKfycbzHAxve4x3yakdkvxTfPbPenUgyIG6qfSI0Q_CoyX10e37UvPabLbx46mDAI0LWssEOPg/exec",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({ action: "add", title, description }),
+          }
+        );
+
+        const result = await response.json();
+        alert(result.message);
+        fetchJobs();
+      }
+
+      async function updateJob() {
+        const row = document.getElementById("jobRow").value;
+        const title = document.getElementById("updateJobTitle").value;
+        const description = document.getElementById(
+          "updateJobDescription"
+        ).value;
+
+        const response = await fetch(
+          "https://script.google.com/macros/s/AKfycbzHAxve4x3yakdkvxTfPbPenUgyIG6qfSI0Q_CoyX10e37UvPabLbx46mDAI0LWssEOPg/exec",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({
+              action: "update",
+              row,
+              title,
+              description,
+            }),
+          }
+        );
+
+        const result = await response.json();
+        alert(result.message);
+        fetchJobs();
+      }
+
+      async function deleteJob(row) {
+        const confirmDelete = confirm(
+          "Apakah Anda yakin ingin menghapus pekerjaan ini?"
+        );
+        if (!confirmDelete) {
+          return;
+        }
+
+        const response = await fetch(
+          "https://script.google.com/macros/s/AKfycbzHAxve4x3yakdkvxTfPbPenUgyIG6qfSI0Q_CoyX10e37UvPabLbx46mDAI0LWssEOPg/exec",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({
+              action: "delete",
+              row,
+            }),
+          }
+        );
+
+        const result = await response.json();
+        alert(result.message);
+        fetchJobs(); //
+      }
+
+      function displayJobs(data) {
+        const jobList = document.getElementById("jobList");
+        jobList.innerHTML = "";
+
+        data.forEach((row, index) => {
+          jobList.innerHTML += `<li>${row[0]} - ${row[1]}
+            <button onclick="populateUpdateForm(${index}, '${row[0]}', '${row[1]}')">Edit</button>
+            <button onclick="deleteJob(${index})">Hapus</button></li>`;
+        });
+      }
+
+      async function searchJob() {
+        const query = document.getElementById("searchQuery").value;
+
+        const response = await fetch(
+          `https://script.google.com/macros/s/AKfycbzHAxve4x3yakdkvxTfPbPenUgyIG6qfSI0Q_CoyX10e37UvPabLbx46mDAI0LWssEOPg/exec?action=search&query=${query}`
+        );
+        const data = await response.json();
+        displayJobs(data);
+      }
+
+      function displayJobs(data) {
+        const jobList = document.getElementById("jobList");
+        jobList.innerHTML = "";
+
+        data.forEach((row, index) => {
+          jobList.innerHTML += `<li>${row[0]} - ${row[1]}
+            <button onclick="populateUpdateForm(${index}, '${row[0]}', '${row[1]}')">Edit</button>
+            <button onclick="deleteJob(${index})">Hapus</button></li>`;
+        });
+      }
+
+      function populateUpdateForm(index, title, description) {
+        document.getElementById("jobRow").value = index;
+        document.getElementById("updateJobTitle").value = title;
+        document.getElementById("updateJobDescription").value = description;
+      }
+
+      window.onload = fetchJobs;
+    </script>
+  </head>
+  <body>
+    <h1>Manajemen Pekerjaan</h1>
+
+    <h2>Tambahkan Pekerjaan</h2>
+    <input type="text" id="jobTitle" placeholder="Nama Pekerjaan" required />
+    <input
+      type="text"
+      id="jobDescription"
+      placeholder="Deskripsi Pekerjaan"
+      required
+    />
+    <button onclick="addJob()">Tambah Pekerjaan</button>
+
+    <h2>Perbaharui Pekerjaan</h2>
+    <input type="hidden" id="jobRow" />
+    <input
+      type="text"
+      id="updateJobTitle"
+      placeholder="Nama Pekerjaan Baru"
+      required
+    />
+    <input
+      type="text"
+      id="updateJobDescription"
+      placeholder="Deskripsi Pekerjaan Baru"
+      required
+    />
+    <button onclick="updateJob()">Perbaharui Pekerjaan</button>
+
+    <h2>Cari Pekerjaan</h2>
+    <input type="text" id="searchQuery" placeholder="Cari..." required />
+    <button onclick="searchJob()">Cari</button>
+
+    <h2>Daftar Pekerjaan</h2>
+    <ul id="jobList"></ul>
+     
+  </body>
+</html>
